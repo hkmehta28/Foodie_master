@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Foodie Admin - Orders</title>
+  <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./assets/css/style.css" />
+
+  <style>
+    /* Basic admin layout */
+    body {
+      background-color: #f7f7f7;
+    }
+
+    .admin-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+        .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        margin-bottom: 20px;
+        }
+
+        .admin-actions {
+        display: flex;
+        gap: 10px;
+        }
+
+        .admin-actions .btn {
+        font-size: 0.9rem;
+        padding: 10px 18px;
+        min-width: 120px;
+        text-align: center;
+        }
+
+
+    .admin-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .orders-table th,
+    .orders-table td {
+      border: 1px solid #eee;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .orders-table th {
+      background-color: #fafafa;
+      font-weight: 600;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      text-transform: capitalize;
+    }
+
+    .status-pending { background: #ffeaa7; color: #664d03; }
+    .status-confirmed { background: #a3e4d7; color: #0b5345; }
+    .status-preparing { background: #f6c453; color: #7a4f01; }
+    .status-out-for-delivery { background: #74b9ff; color: #0c2461; }
+    .status-completed { background: #c6f6d5; color: #22543d; }
+    .status-cancelled { background: #ffcccc; color: #8b0000; }
+
+    .status-select {
+      font-size: 0.8rem;
+      padding: 2px 4px;
+    }
+
+    .small-text {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    .items-list {
+      list-style: disc;
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .refresh-btn {
+      font-size: 0.85rem;
+      padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1 class="admin-title">Orders Dashboard</h1>
+    <div class="admin-actions">
+    <button id="refresh-btn" class="btn btn-hover">Refresh</button>
+    <a href="./index.html" class="btn btn-hover">Go to Website</a>
+</div>
+
+    </div>
+
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Placed At</th>
+        </tr>
+      </thead>
+      <tbody id="orders-tbody">
+        <!-- JS will inject rows here -->
+      </tbody>
+    </table>
+
+    <p id="orders-empty" class="small-text" style="margin-top: 10px; display: none;">
+      No orders yet.
+    </p>
+  </div>
+
+  <script src="./assets/js/admin.js"></script>
+</body>
+</html>
