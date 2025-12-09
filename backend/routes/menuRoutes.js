@@ -1,76 +1,29 @@
-// backend/routes/orderRoutes.js
+// backend/routes/menuRoutes.js
 const express = require("express");
 const router = express.Router();
 
-const Order = require("../models/order");
+const MenuItem = require("../models/MenuItem");
 
+// GET /api/menu
+// Optional query param: ?category=Burger
 router.get("/", async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
-    res.json({
-      status: "ok",
-      data: orders,
-    });
-  } catch (err) {
-    console.error("Error fetching orders:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Failed to fetch orders",
-    });
-  }
-});
+    const { category } = req.query;
+    let query = {};
 
-
-// POST /api/orders  -> create new order
-router.post("/", async (req, res) => {
-  try {
-    const { customerName, email, phone, address, note, items } = req.body;
-
-    if (!customerName || !phone || !address || !Array.isArray(items) || !items.length) {
-      return res.status(400).json({
-        status: "error",
-        message: "Missing required fields or empty cart.",
-      });
+    if (category) {
+      // simple case-insensitive match could be done with regex, 
+      // but for now let's do exact match or whatever user expects.
+      // Front-end sends "Burger", "Pizza", etc.
+      query.category = category;
     }
 
-    // calculate total & map items
-    const mappedItems = items.map((it) => ({
-      menuItem: it._id, // Mongo _id of menu item
-      name: it.name,
-      price: it.price,
-      quantity: it.quantity,
-    }));
-
-    const totalAmount = mappedItems.reduce(
-      (sum, it) => sum + it.price * it.quantity,
-      0
-    );
-
-    const order = await Order.create({
-      customerName,
-      email,
-      phone,
-      address,
-      note,
-      items: mappedItems,
-      totalAmount,
-    });
-
-    res.status(201).json({
-      status: "ok",
-      message: "Order placed successfully",
-      data: order,
-    });
+    const items = await MenuItem.find(query);
+    res.json(items); // send array directly as expected by frontend
   } catch (err) {
-    console.error("Error creating order:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Failed to create order",
-    });
+    console.error("Error fetching menu:", err);
+    res.status(500).json({ message: "Server Error" });
   }
 });
-
-// (Optional) GET /api/orders -> later for admin dashboard
-
 
 module.exports = router;

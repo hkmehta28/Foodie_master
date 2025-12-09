@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 
 const MONGODB_URI =
-  process.env.MONGODB_URI ||
+  process.env.MONGO_URI ||
   "YOUR_ATLAS_CONNECTION_STRING_HERE"; // keep your existing working URI here
 
 async function connectDB() {
