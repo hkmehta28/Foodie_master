@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>My Orders</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div style="max-width:900px; margin:30px auto; padding:16px;">
+    <h2>My Orders</h2>
+    <div id="orders-list"></div>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:4000";
+    const token = localStorage.getItem("userToken");
+    const list = document.getElementById("orders-list");
+    if (!token) {
+      list.innerHTML = '<p>Please <a href="./auth/login.html">login</a> to see orders.</p>';
+    } else {
+      (async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/users/my-orders`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            list.innerHTML = `<p>Error: ${data.message || "Failed"}</p>`;
+            return;
+          }
+          const orders = data.data || [];
+          if (!orders.length) {
+            list.innerHTML = "<p>No orders yet.</p>";
+            return;
+          }
+          list.innerHTML = orders.map(o => {
+            return `<div style="border:1px solid #eee; padding:10px; margin-bottom:10px;">
+              <div><strong>Order ID:</strong> ${o._id}</div>
+              <div><strong>Status:</strong> ${o.status}</div>
+              <div><strong>Placed:</strong> ${new Date(o.createdAt).toLocaleString()}</div>
+              <div><strong>Total:</strong> ₹${o.totalAmount || 0}</div>
+              <div><strong>Items:</strong>
+                <ul>${(o.items||[]).map(i=>`<li>${i.name} × ${i.quantity}</li>`).join("")}</ul>
+              </div>
+            </div>`;
+          }).join("");
+        } catch (err) {
+          console.error(err);
+          list.innerHTML = "<p>Failed to load orders.</p>";
+        }
+      })();
+    }
+  </script>
+</body>
+</html>

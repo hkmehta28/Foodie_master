@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Login - Foodie</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div style="max-width:420px; margin:40px auto; padding:16px; background:#fff; border-radius:8px;">
+    <h2>Login</h2>
+    <div id="msg" style="color:red; display:none;"></div>
+    <input id="email" placeholder="Email" class="auth-input" />
+    <input id="password" type="password" placeholder="Password" class="auth-input" />
+    <button id="login-btn" class="btn">Login</button>
+    <p class="small-text">No account? <a href="./signup.html">Sign up</a></p>
+  </div>
+
+  <script>
+    const API_BASE_URL = "http://localhost:4000";
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const msg = document.getElementById("msg");
+      msg.style.display = "none";
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      if (!email || !password) { msg.textContent = "Provide email & password"; msg.style.display="block"; return; }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/users/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          msg.textContent = data.message || "Login failed";
+          msg.style.display = "block";
+          return;
+        }
+
+        localStorage.setItem("userToken", data.data.token);
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+        window.location.href = "../index.html";
+      } catch (err) {
+        msg.textContent = "Login error";
+        msg.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

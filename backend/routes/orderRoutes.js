@@ -1,4 +1,5 @@
 // backend/routes/orderRoutes.js
+const { authAdmin } = require("../middleware/authMiddleware");
 const express = require("express");
 const router = express.Router();
 
@@ -56,7 +57,7 @@ router.post("/", async (req, res) => {
 });
 
 // GET /api/orders  -> list all orders (for admin)
-router.get("/", async (req, res) => {
+router.get("/", authAdmin, async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.json({
@@ -73,7 +74,7 @@ router.get("/", async (req, res) => {
 });
 
 // PATCH /api/orders/:id/status  -> update order status
-router.patch("/:id/status", async (req, res) => {
+router.patch("/:id/status", authAdmin, async (req, res) => {
   try {
     const { status } = req.body;
     const allowed = [

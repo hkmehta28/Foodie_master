@@ -1,0 +1,10 @@
+TypeError: next is not a function
+TypeError: next is not a function
+    at model.<anonymous> (D:\Food Order\Foodie_master\backend\models\User.js:18:3)
+    at async Kareem.execPre (D:\Food Order\Foodie_master\backend\node_modules\kareem\index.js:65:24)
+    at async model.$__save (D:\Food Order\Foodie_master\backend\node_modules\mongoose\lib\model.js:369:5)
+    at async model.save (D:\Food Order\Foodie_master\backend\node_modules\mongoose\lib\model.js:609:5)
+    at async D:\Food Order\Foodie_master\backend\node_modules\mongoose\lib\model.js:2722:9
+    at async Promise.all (index 0)
+    at async model.create (D:\Food Order\Foodie_master\backend\node_modules\mongoose\lib\model.js:2707:11)
+    at async test (D:\Food Order\Foodie_master\backend\test_user_create.js:13:18)

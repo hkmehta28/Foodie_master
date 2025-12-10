@@ -101,41 +101,174 @@
       font-size: 0.85rem;
       padding: 6px 10px;
     }
+
+    /* Fixed Button Styles for Table */
+    .orders-table .btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      min-width: auto;
+      height: auto;
+      display: inline-block;
+      margin-right: 5px;
+      margin-bottom: 4px;
+    }
+
+    .menu-edit-btn { --bg-color: #2980b9; } 
+    .menu-delete-btn { --bg-color: #c0392b; }
+    .menu-toggle-btn { --bg-color: #f39c12; color: #fff; }
+
+    /* Fixed Button Styles for Header Actions */
+    #open-add-menu-btn,
+    #refresh-menu-btn {
+      font-size: 0.9rem;
+      padding: 8px 16px;
+      height: auto;
+      min-width: unset;
+      display: inline-block;
+    }
+    input[type="file"] {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      appearance: auto !important; /* Restore native appearance */
+      border: 1px solid #ddd !important;
+      background-color: #f9f9f9 !important;
+      padding: 6px !important;
+      border-radius: 4px !important;
+      height: auto !important;
+      width: 100% !important;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
-
   <div class="admin-container">
-    <div class="admin-header">
-      <h1 class="admin-title">Orders Dashboard</h1>
-    <div class="admin-actions">
-    <button id="refresh-btn" class="btn btn-hover">Refresh</button>
-    <a href="./index.html" class="btn btn-hover">Go to Website</a>
-</div>
 
+    <!-- LOGIN SECTION -->
+    <section id="login-section" style="margin-bottom: 20px;">
+      <h2 style="font-size: 1.1rem; margin-bottom: 8px;">Admin Login</h2>
+
+      <div id="login-message" class="small-text" style="color: red; display: none; margin-bottom: 6px;"></div>
+
+      <input
+        type="email"
+        id="admin-email"
+        class="admin-input"
+        placeholder="Admin email"
+        style="width: 100%; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #ddd;"
+      />
+      <input
+        type="password"
+        id="admin-password"
+        class="admin-input"
+        placeholder="Password"
+        style="width: 100%; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #ddd;"
+      />
+
+      <button id="login-btn" class="btn btn-hover" style="min-width: 120px;">Login</button>
+
+    </section>
+
+      <!-- MENU MANAGEMENT SECTION -->
+    <section id="menu-section" style="margin-top: 30px; display: none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;">
+        <h2 style="margin:0; font-size:1.1rem;">Menu Management</h2>
+        <div>
+          <button id="open-add-menu-btn" class="btn btn-hover">Add Menu Item</button>
+          <button id="refresh-menu-btn" class="btn btn-hover">Refresh Menu</button>
+        </div>
+      </div>
+
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price (₹)</th>
+            <th>Veg</th>
+            <th>Available</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="menu-tbody">
+          <!-- injected by JS -->
+        </tbody>
+      </table>
+
+      <p id="menu-empty" class="small-text" style="margin-top:10px; display:none;">No menu items.</p>
+    </section>
+
+    <!-- MENU FORM MODAL (hidden) -->
+    <div id="menu-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:9999;">
+      <div style="background:#fff; padding:18px; border-radius:8px; width:420px; max-width:95%;">
+        <h3 id="menu-modal-title">Add Menu Item</h3>
+
+        <div id="menu-form-msg" class="small-text" style="color:red; display:none; margin-bottom:8px;"></div>
+
+        <input id="menu-name" placeholder="Name" class="admin-input" style="margin-bottom:8px;" />
+        <input id="menu-category" placeholder="Category (eg. Burger, Pizza)" class="admin-input" style="margin-bottom:8px;" />
+        <input id="menu-price" placeholder="Price (number)" class="admin-input" style="margin-bottom:8px;" />
+        <!-- OPTIONAL: type/paste a direct image URL -->
+        <input id="menu-image" placeholder="Paste image URL (optional)" class="admin-input" style="margin-bottom:8px;" />
+
+        <!-- Upload image from computer -->
+        <label style="display:block; margin-bottom:12px;">
+          <span class="small-text">Or upload an image:</span><br>
+          <input type="file" id="menu-file" accept="image/*" />
+        </label>
+
+        <label style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <input id="menu-isVeg" type="checkbox" /> Veg
+          <input id="menu-isAvailable" type="checkbox" style="margin-left:12px;" /> Available
+        </label>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
+          <button id="menu-cancel-btn" class="btn btn-hover">Cancel</button>
+          <button id="menu-save-btn" class="btn btn-hover" style="background:#ff9f0d; color:#fff;">Save</button>
+        </div>
+      </div>
     </div>
 
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Customer</th>
-          <th>Items</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Placed At</th>
-        </tr>
-      </thead>
-      <tbody id="orders-tbody">
-        <!-- JS will inject rows here -->
-      </tbody>
-    </table>
+    <!-- ORDERS SECTION (hidden until login) -->
+    <section id="orders-section" style="display: none;">
+      <div class="admin-header">
+        <h1 class="admin-title">Orders Dashboard</h1>
 
-    <p id="orders-empty" class="small-text" style="margin-top: 10px; display: none;">
-      No orders yet.
-    </p>
+        <div class="admin-actions">
+          <span id="admin-email-display" class="small-text" style="margin-right: 8px;"></span>
+          <button id="refresh-btn" class="btn btn-hover">Refresh</button>
+          <button id="logout-btn" class="btn btn-hover">Logout</button>
+          <a href="./index.html" class="btn btn-hover">Go to Website</a>
+        </div>
+      </div>
+
+      <div id="orders-message" class="small-text" style="color: red; display: none; margin-bottom: 6px;"></div>
+      <div id="orders-success" class="small-text" style="color: green; display: none; margin-bottom: 6px;"></div>
+
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Placed At</th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody">
+          <!-- JS will inject rows here -->
+        </tbody>
+      </table>
+
+      <p id="orders-empty" class="small-text" style="margin-top: 10px; display: none;">
+        No orders yet.
+      </p>
+    </section>
+
   </div>
 
   <script src="./assets/js/admin.js"></script>
 </body>
+
 </html>
