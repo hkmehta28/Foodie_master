@@ -15,6 +15,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Fix for Postman/clients sending trailing newlines
+app.use((req, res, next) => {
+  if (req.url.endsWith("%0A")) {
+    req.url = req.url.slice(0, -3);
+  }
+  next();
+});
+
 
 // routes
 app.use("/api/menu", menuRoutes);

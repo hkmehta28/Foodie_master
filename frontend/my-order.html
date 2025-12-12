@@ -1,55 +1,141 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>My Orders</title>
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <title>My Orders - Foodie</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f7f7f7;
+      color: #222;
+    }
+    .order-container {
+      max-width: 900px;
+      margin: 120px auto 32px; /* Added top margin for navbar space */
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    h2 { margin-bottom: 20px; }
+
+    .order-card {
+      border: 1px solid #eee;
+      background: #fafafa;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .status-pending { background: #fff0c2; color: #8a6c00; }
+    .status-confirmed { background: #d6f5e3; color: #0a5c34; }
+    .status-preparing { background: #ffe7c2; color: #884f00; }
+    .status-out-for-delivery { background: #cfe3ff; color: #003c90; }
+    .status-completed { background: #d6f5d6; color: #0f6a0f; }
+    .status-cancelled { background: #ffd6d6; color: #a60000; }
+
+    ul { margin: 8px 0 0 20px; }
+    .muted { color: #777; }
+  </style>
 </head>
+
 <body>
-  <div style="max-width:900px; margin:30px auto; padding:16px;">
+  <div class="order-container">
     <h2>My Orders</h2>
     <div id="orders-list"></div>
   </div>
 
+  <script src="../assets/js/auth.js"></script>
   <script>
     const API_BASE_URL = "http://localhost:4000";
-    const token = localStorage.getItem("userToken");
+    const token = window.auth?.getToken ? window.auth.getToken() : localStorage.getItem("userToken");
+
     const list = document.getElementById("orders-list");
+
     if (!token) {
-      list.innerHTML = '<p>Please <a href="./auth/login.html">login</a> to see orders.</p>';
+      list.innerHTML = `
+        <p>Please <a href="../auth/login.html">login</a> to view your orders.</p>
+      `;
     } else {
-      (async () => {
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/users/my-orders`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const data = await res.json();
-          if (!res.ok) {
-            list.innerHTML = `<p>Error: ${data.message || "Failed"}</p>`;
-            return;
-          }
-          const orders = data.data || [];
-          if (!orders.length) {
-            list.innerHTML = "<p>No orders yet.</p>";
-            return;
-          }
-          list.innerHTML = orders.map(o => {
-            return `<div style="border:1px solid #eee; padding:10px; margin-bottom:10px;">
-              <div><strong>Order ID:</strong> ${o._id}</div>
-              <div><strong>Status:</strong> ${o.status}</div>
-              <div><strong>Placed:</strong> ${new Date(o.createdAt).toLocaleString()}</div>
-              <div><strong>Total:</strong> ₹${o.totalAmount || 0}</div>
-              <div><strong>Items:</strong>
-                <ul>${(o.items||[]).map(i=>`<li>${i.name} × ${i.quantity}</li>`).join("")}</ul>
-              </div>
-            </div>`;
-          }).join("");
-        } catch (err) {
-          console.error(err);
-          list.innerHTML = "<p>Failed to load orders.</p>";
+      loadOrders();
+    }
+
+    async function loadOrders() {
+      try {
+        list.innerHTML = "<p>Loading orders...</p>";
+
+        const res = await fetch(`${API_BASE_URL}/api/users/my-orders`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          list.innerHTML = `<p style="color:red;">${data.message || "Failed to load orders"}</p>`;
+          return;
         }
-      })();
+
+        const orders = data.data || [];
+
+        if (orders.length === 0) {
+          list.innerHTML = `<p>No orders yet. <a href="../index.html">Browse Menu</a></p>`;
+          return;
+        }
+
+        list.innerHTML = orders.map(orderHTML).join("");
+      } catch (err) {
+        console.error(err);
+        list.innerHTML = "<p style='color:red;'>Something went wrong.</p>";
+      }
+    }
+
+    function orderHTML(o) {
+      const statusClass = "status-" + ((o.status || "pending").replace(/\s+/g, "-").toLowerCase());
+
+      return `
+        <div class="order-card">
+          <div class="order-header">
+            <div>
+              <strong>Order ID:</strong> ${o._id}<br>
+              <span class="muted">${new Date(o.createdAt).toLocaleString()}</span>
+            </div>
+            <span class="status-badge ${statusClass}">
+              ${o.status}
+            </span>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <strong>Items:</strong>
+            <ul>
+              ${(o.items || [])
+                .map(i => `<li>${i.name} × ${i.quantity} — ₹${(i.price * i.quantity).toFixed(2)}</li>`)
+                .join("")}
+            </ul>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <strong>Total:</strong> ₹${(o.totalAmount || 0).toFixed(2)}
+          </div>
+        </div>
+      `;
     }
   </script>
+  <script src="./assets/js/nav.js"></script>
+
 </body>
 </html>

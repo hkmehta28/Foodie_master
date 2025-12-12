@@ -1,28 +1,217 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Login - Foodie</title>
-  <link rel="stylesheet" href="../assets/css/style.css" />
-</head>
-<body>
-  <div style="max-width:420px; margin:40px auto; padding:16px; background:#fff; border-radius:8px;">
-    <h2>Login</h2>
-    <div id="msg" style="color:red; display:none;"></div>
-    <input id="email" placeholder="Email" class="auth-input" />
-    <input id="password" type="password" placeholder="Password" class="auth-input" />
-    <button id="login-btn" class="btn">Login</button>
-    <p class="small-text">No account? <a href="./signup.html">Sign up</a></p>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Foodie</title>
+
+  <!-- favicon -->
+  <link rel="shortcut icon" href="../favicon.svg" type="image/svg+xml">
+
+  <!-- custom css link -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <!-- google font link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Rubik:wght@400;500;600;700&family=Shadows+Into+Light&display=swap"
+    rel="stylesheet">
+    
+  <style>
+    /* Auth specific overrides */
+    .auth-section {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--isabelline);
+        background-image: url('../assets/images/hero-bg.jpg'); /* Reuse existing background */
+        background-size: cover;
+        background-position: center;
+        padding-top: 120px; /* Space for fixed header */
+        padding-bottom: 60px;
+    }
+    
+    .auth-card {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-2);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    
+    .auth-title {
+        font-family: var(--ff-rubik);
+        font-size: var(--fs-2);
+        color: var(--rich-black-fogra-29);
+        margin-bottom: 10px;
+    }
+    
+    .auth-subtitle {
+        color: var(--sonic-silver);
+        margin-bottom: 30px;
+        font-size: var(--fs-4);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--rich-black-fogra-29);
+        font-weight: var(--fw-500);
+    }
+    
+    .auth-btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .auth-footer {
+        margin-top: 20px;
+        font-size: 1.4rem;
+    }
+    
+    .auth-footer a {
+        color: var(--deep-saffron);
+        font-weight: var(--fw-500);
+        display: inline;
+    }
+    
+    .error-msg {
+        background-color: #ffe6e6;
+        color: #d63031;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+        display: none;
+        text-align: left;
+    }
+  </style>
+</head>
+
+<body id="top">
+
+  <!-- HEADER -->
+  <header class="header" data-header>
+    <div class="container">
+      <h1>
+        <a href="../index.html" class="logo">Foodie<span class="span">.</span></a>
+      </h1>
+
+      <nav class="navbar" data-navbar>
+        <ul class="navbar-list">
+          <li class="nav-item">
+            <a href="../index.html" class="navbar-link" data-nav-link>Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="../index.html#food-menu" class="navbar-link" data-nav-link>Shop</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-btn-group">
+        <button class="nav-toggle-btn" aria-label="Toggle Menu" data-menu-toggle-btn>
+          <span class="line top"></span>
+          <span class="line middle"></span>
+          <span class="line bottom"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="auth-section">
+        <div class="auth-card">
+            <h2 class="auth-title">Welcome Back!</h2>
+            <p class="auth-subtitle">Login to continue to Foodie</p>
+            
+            <div id="msg" class="error-msg"></div>
+            
+            <form id="login-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" placeholder="example@mail.com" class="input-field" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" class="input-field" required>
+                </div>
+                
+                <button type="submit" id="login-btn" class="btn btn-hover auth-btn">Login</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="./signup.html">Sign Up</a></p>
+            </div>
+        </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top" style="background-image: url('../assets/images/footer-illustration.png')">
+      <div class="container">
+        <div class="footer-brand">
+          <a href="../index.html" class="logo">Foodie<span class="span">.</span></a>
+          <p class="footer-text">
+            Financial experts support or help you to to find out which way you can raise your funds more.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="container">
+        <p class="copyright-text">
+          &copy; 2022 <a href="#" class="copyright-link">codewithsadee</a> All Rights Reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="../assets/js/script.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  
   <script>
     const API_BASE_URL = "http://localhost:4000";
-    document.getElementById("login-btn").addEventListener("click", async () => {
+    
+    // Simple script.js toggle doesn't work well outside index structure sometimes if classes differ, 
+    // ensuring nav toggle works
+    const navTogglers = document.querySelectorAll("[data-menu-toggle-btn]");
+    const navbar = document.querySelector("[data-navbar]");
+    
+    const toggleNavbar = function () {
+        navbar.classList.toggle("active");
+        document.body.classList.toggle("active");
+    }
+
+    addEventOnElem(navTogglers, "click", toggleNavbar);
+
+    // Login Logic
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("login-btn");
       const msg = document.getElementById("msg");
+      
       msg.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Logging in...";
+      
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      if (!email || !password) { msg.textContent = "Provide email & password"; msg.style.display="block"; return; }
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/users/login`, {
@@ -31,20 +220,42 @@
           body: JSON.stringify({ email, password }),
         });
         const data = await res.json();
+        
         if (!res.ok) {
-          msg.textContent = data.message || "Login failed";
-          msg.style.display = "block";
-          return;
+          throw new Error(data.message || "Login failed");
         }
 
         localStorage.setItem("userToken", data.data.token);
         localStorage.setItem("user", JSON.stringify(data.data.user));
-        window.location.href = "../index.html";
+        
+        btn.textContent = "Success!";
+        setTimeout(() => {
+            window.location.href = "../index.html";
+        }, 500);
+        
       } catch (err) {
-        msg.textContent = "Login error";
+        msg.textContent = err.message;
         msg.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "Login";
       }
     });
+
+    /**
+     * add event on element helper (from script.js potentially, but inline defined to be safe)
+     */
+    function addEventOnElem(elem, type, callback) {
+        if (elem.length > 1) {
+            for (let i = 0; i < elem.length; i++) {
+                elem[i].addEventListener(type, callback);
+            }
+        } else {
+            elem.addEventListener(type, callback);
+        }
+    }
   </script>
+  
+  <script src="../assets/js/auth.js"></script>
+
 </body>
 </html>

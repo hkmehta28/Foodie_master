@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Checkout - Foodie</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./assets/css/style.css" />
+  <style>
+    /* simple checkout styles */
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f7f7f7; color:#333; }
+    .wrap { max-width: 980px; margin:120px auto 32px; padding:20px; }
+    .card { background:#fff; border-radius:10px; padding:18px; box-shadow:0 8px 30px rgba(0,0,0,0.06); margin-bottom:18px; }
+    h1 { margin:0 0 12px 0; font-size:1.4rem; }
+    .grid { display:grid; gap:20px; grid-template-columns: 1fr 420px; }
+    .col { }
+    .form-row { margin-bottom:10px; }
+    input[type="text"], input[type="email"], input[type="tel"] { width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; }
+    .items-list { width:100%; border-collapse: collapse; margin-bottom:12px; }
+    .items-list th, .items-list td { padding:8px 10px; border-bottom: 1px solid #eee; text-align:left; vertical-align: middle; }
+    .summary { font-size:0.95rem; }
+    .btn { display:inline-block; background:#ff9f0d; color:#fff; padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
+    .muted { color:#666; font-size:0.9rem; }
+    .small { font-size:0.85rem; color:#666; }
+    .qty { min-width:40px; text-align:center; }
+    .center { text-align:center; }
+    .empty { text-align:center; padding:30px; color:#777; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Checkout</h1>
+      <p class="muted">Review your items, confirm delivery details and place order.</p>
+    </div>
+
+    <div class="grid">
+      <!-- left: customer details + instructions -->
+      <div class="col">
+        <div class="card">
+          <h2 style="font-size:1.1rem;">Delivery details</h2>
+
+          <!-- These input IDs match the auth.js autofill -->
+          <div class="form-row">
+            <label class="small">Name</label>
+            <input id="customer-name" type="text" placeholder="Full name" />
+          </div>
+          <div class="form-row">
+            <label class="small">Email</label>
+            <input id="customer-email" type="email" placeholder="Email" />
+          </div>
+          <div class="form-row">
+            <label class="small">Phone</label>
+            <input id="customer-phone" type="tel" placeholder="Phone" />
+          </div>
+          <div class="form-row">
+            <label class="small">Address</label>
+            <input id="customer-address" type="text" placeholder="Delivery address" />
+          </div>
+
+          <div id="checkout-msg" class="small" style="color:red; display:none;"></div>
+
+          <div style="margin-top:12px;">
+            <button id="place-order-btn" class="btn">Place order</button>
+            <button id="back-btn" class="btn" style="background:#ddd;color:#222;margin-left:8px;">Back to menu</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="font-size:1.1rem;">Notes</h2>
+          <p class="small">By placing the order you confirm that the details are correct. If you're not logged in, your order will be created as a guest — create an account to save order history.</p>
+          <p class="small">If you want to login first, <a href="./auth/login.html">Login</a> or <a href="./auth/signup.html">Sign up</a>.</p>
+        </div>
+      </div>
+
+      <!-- right: order summary -->
+      <div class="col">
+        <div class="card">
+          <h2 style="font-size:1.1rem;">Order summary</h2>
+          <div id="order-container">
+            <table class="items-list" id="items-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th class="center">Qty</th>
+                  <!-- <th class="center">Price</th> -->
+                  <th class="center">Total</th>
+                </tr>
+              </thead>
+              <tbody id="items-tbody">
+                <!-- rows injected here -->
+              </tbody>
+            </table>
+
+            <div id="empty-cart" class="empty" style="display:none;">Your cart is empty. <a href="./index.html">Go to menu</a></div>
+
+            <div id="summary" class="summary" style="display:none;">
+              <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                <div class="muted">Subtotal</div>
+                <div id="subtotal-amt">₹0.00</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                <div class="muted">Delivery</div>
+                <div id="delivery-amt">₹0.00</div>
+              </div>
+              <hr />
+              <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:6px;">
+                <div>Total</div>
+                <div id="total-amt">₹0.00</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- scripts -->
+  <!-- auth.js provides getToken(), getUser(), autofillCheckout() etc. -->
+  <script src="./assets/js/auth.js"></script>
+
+  <script>
+    // ------- checkout page JS -------
+    const CART_KEYS = ["cart", "foodie_cart", "my_cart"]; // look for common keys
+    function readCartFromStorage() {
+      for (const k of CART_KEYS) {
+        const s = localStorage.getItem(k);
+        if (!s) continue;
+        try {
+          const parsed = JSON.parse(s);
+          if (Array.isArray(parsed)) return { items: parsed, key: k };
+          // maybe stored as { items: [...], total: x }
+          if (parsed.items && Array.isArray(parsed.items)) return { items: parsed.items, key: k };
+        } catch (e) {
+          console.warn("Cart parse error for", k, e);
+        }
+      }
+      return { items: [], key: null };
+    }
+
+    function currency(x) {
+      return "₹" + Number(x).toFixed(2);
+    }
+
+    function renderCart() {
+      const { items } = readCartFromStorage();
+      const tbody = document.getElementById("items-tbody");
+      const empty = document.getElementById("empty-cart");
+      const summary = document.getElementById("summary");
+      tbody.innerHTML = "";
+
+      if (!items || items.length === 0) {
+        empty.style.display = "block";
+        summary.style.display = "none";
+        return;
+      }
+
+      empty.style.display = "none";
+      summary.style.display = "block";
+
+      let subtotal = 0;
+      items.forEach((it, idx) => {
+        // default shape: { id, name, price, quantity }
+        const qty = Number(it.quantity || it.qty || 1);
+        const price = Number(it.price || it.unitPrice || 0);
+        const row = document.createElement("tr");
+
+        // Column 1: Item Details + Unit Price
+        const tdName = document.createElement("td");
+        tdName.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;" />` : ''}
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.95rem; line-height:1.2; margin-bottom:4px;">${it.name}</div>
+            <div class="small" style="font-size:0.85rem; color:#777;">${currency(price)}</div>
+          </div>
+        </div>`;
+
+        // Column 2: Quantity Controls
+        const tdQty = document.createElement("td");
+        tdQty.className = "center";
+        tdQty.style.whiteSpace = "nowrap"; // Prevent buttons from wrapping
+        tdQty.innerHTML = `
+          <div style="display:inline-flex; align-items:center; background:#f0f0f0; border-radius:6px; padding:2px;">
+            <button onclick="updateQuantity(${idx}, -1)" style="width:28px; height:28px; border:none; background:transparent; font-weight:bold; color:#555; cursor:pointer;">-</button>
+            <span style="font-weight:600; font-size:0.9rem; min-width:24px; text-align:center;">${qty}</span>
+            <button onclick="updateQuantity(${idx}, 1)" style="width:28px; height:28px; border:none; background:transparent; font-weight:bold; color:#555; cursor:pointer;">+</button>
+          </div>
+        `;
+
+        // Column 3: Subtotal
+        const tdSub = document.createElement("td");
+        tdSub.className = "center";
+        tdSub.style.fontWeight = "700";
+        tdSub.style.fontSize = "0.95rem";
+        tdSub.textContent = currency(qty * price);
+
+        row.appendChild(tdName);
+        row.appendChild(tdQty);
+        row.appendChild(tdSub); // Removed individual Price column
+
+        tbody.appendChild(row);
+
+        subtotal += qty * price;
+      });
+
+      // Simple flat delivery fee logic (you can change)
+      const delivery = subtotal > 0 && subtotal < 500 ? 30 : 0;
+      document.getElementById("subtotal-amt").textContent = currency(subtotal);
+      document.getElementById("delivery-amt").textContent = currency(delivery);
+      document.getElementById("total-amt").textContent = currency(subtotal + delivery);
+    }
+
+    // placeOrder: sends order to backend and includes auth token if available
+    async function placeOrder() {
+      const placeBtn = document.getElementById("place-order-btn");
+      const msgEl = document.getElementById("checkout-msg");
+      if (msgEl) { msgEl.style.display = "none"; msgEl.textContent = ""; }
+
+      // collect form fields
+      const name = document.getElementById("customer-name")?.value.trim() || "";
+      const phone = document.getElementById("customer-phone")?.value.trim() || "";
+      const email = document.getElementById("customer-email")?.value.trim() || "";
+      const address = document.getElementById("customer-address")?.value.trim() || "";
+
+      if (!name || !phone || !address) {
+        if (msgEl) { msgEl.textContent = "Please fill name, phone and address."; msgEl.style.display = "block"; }
+        return;
+      }
+
+      const { items, key } = readCartFromStorage();
+      if (!items || items.length === 0) {
+        if (msgEl) { msgEl.textContent = "Your cart is empty."; msgEl.style.display = "block"; }
+        return;
+      }
+
+      // compute totals same as renderCart
+      let subtotal = 0;
+      const normalizedItems = items.map(it => {
+        const qty = Number(it.quantity || it.qty || 1);
+        const price = Number(it.price || it.unitPrice || 0);
+        subtotal += qty * price;
+        return { menuItem: it._id || it.id, name: it.name, price, quantity: qty };
+      });
+      const delivery = subtotal > 0 && subtotal < 500 ? 30 : 0;
+      const totalAmount = subtotal + delivery;
+
+      // build payload
+      const payload = {
+        items: normalizedItems,
+        totalAmount,
+        customerName: name,
+        phone,
+        email,
+        address,
+      };
+
+      // token from auth.js (auth saved token as "userToken")
+      const token = window.auth?.getToken ? window.auth.getToken() : localStorage.getItem("userToken");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      try {
+        placeBtn.disabled = true;
+        placeBtn.textContent = "Placing...";
+
+        const res = await fetch("http://localhost:4000/api/orders", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          console.error("Order error:", data);
+          if (msgEl) { msgEl.textContent = data.message || data.detail || "Order failed"; msgEl.style.display = "block"; }
+          placeBtn.disabled = false;
+          placeBtn.textContent = "Place order";
+          return;
+        }
+
+        // success: clear cart
+        // remove all known keys
+        for (const k of CART_KEYS) localStorage.removeItem(k);
+
+        // redirect to my-orders page (adjust path if needed)
+        window.location.href = "/frontend/my-order.html";
+      } catch (err) {
+        console.error("Place order error:", err);
+        if (msgEl) { msgEl.textContent = "Failed to place order"; msgEl.style.display = "block"; }
+      } finally {
+        placeBtn.disabled = false;
+        placeBtn.textContent = "Place order";
+      }
+    }
+
+      document.addEventListener("DOMContentLoaded", () => {
+      // allow auth.js to auto-fill (auth.js runs its own DOMContentLoaded too)
+      try { window.auth?.autofillCheckout(); } catch(e) {}
+      renderCart();
+
+      // wire place order button
+      const placeBtn = document.getElementById("place-order-btn");
+      if (placeBtn) placeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        placeOrder();
+      });
+
+      const back = document.getElementById("back-btn");
+      if (back) back.addEventListener("click", (e) => { e.preventDefault(); window.location.href = "./index.html"; });
+
+      // live update if cart changes in another tab
+      window.addEventListener("storage", (e) => {
+        // if (CART_KEYS.includes(e.key)) renderCart(); // Disabled to avoid conflict with local updates
+      });
+      
+      // Also listen for internal events
+      window.addEventListener("cartUpdated", renderCart);
+    });
+
+    // New function to update quantity
+    function updateQuantity(index, delta) {
+      const { items, key } = readCartFromStorage();
+      if (!items || !items[index]) return;
+
+      const currentQty = Number(items[index].quantity || items[index].qty || 1);
+      const newQty = currentQty + delta;
+
+      if (newQty <= 0) {
+        if (confirm("Remove this item from cart?")) {
+          items.splice(index, 1);
+        } else {
+          return; // Cancelled
+        }
+      } else {
+        items[index].quantity = newQty;
+        // fallback for other schemas
+        items[index].qty = newQty;
+      }
+
+      // Save back
+      if (key) {
+        localStorage.setItem(key, JSON.stringify(items));
+      } else {
+        // default to "cart" if no key found (rare)
+        localStorage.setItem("cart", JSON.stringify(items));
+      }
+
+      // Dispatch event for navbar
+      window.dispatchEvent(new Event("cartUpdated"));
+      
+      // Re-render
+      renderCart();
+    }
+  </script>
+  <script src="./assets/js/nav.js"></script>
+
+</body>
+</html>

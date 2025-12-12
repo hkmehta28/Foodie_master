@@ -3,8 +3,10 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const AdminUser = require("../models/AdminUser");
+const adminAuth = require("../middleware/adminAuth");
 
 const router = express.Router();
+router.use(adminAuth);
 
 // Helper: generate JWT
 const generateToken = (adminId) => {

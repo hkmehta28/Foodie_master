@@ -35,6 +35,8 @@ function updateCartBadge() {
   if (countSpan) {
     countSpan.textContent = getCartCount();
   }
+  // Notify other components (like nav.js) that cart has changed
+  window.dispatchEvent(new Event("cartUpdated"));
 }
 
 function renderCart() {
@@ -120,40 +122,42 @@ function setupCartUI() {
   const cartList = document.getElementById("cart-items");
   const checkoutForm = document.getElementById("checkout-form");
 
-  if (!cartBtn || !cartPanel || !cartBackdrop || !cartClose || !cartList) {
-    console.warn("Cart UI elements missing");
-    return;
+  // If we are on checkout page, some elements might be missing, which is fine.
+  // But we need to handle what actions are available.
+
+  if (cartBtn && cartPanel && cartBackdrop && cartClose) {
+    const openCart = () => {
+      cartPanel.classList.add("open");
+      cartBackdrop.classList.add("open");
+    };
+
+    const closeCart = () => {
+      cartPanel.classList.remove("open");
+      cartBackdrop.classList.remove("open");
+    };
+
+    cartBtn.addEventListener("click", openCart);
+    cartClose.addEventListener("click", closeCart);
+    cartBackdrop.addEventListener("click", closeCart);
   }
 
-  const openCart = () => {
-    cartPanel.classList.add("open");
-    cartBackdrop.classList.add("open");
-  };
+  // quantity + remove (event delegation) - works for both side panel and checkout page list
+  if (cartList) {
+    cartList.addEventListener("click", (e) => {
+      const target = e.target;
 
-  const closeCart = () => {
-    cartPanel.classList.remove("open");
-    cartBackdrop.classList.remove("open");
-  };
+      if (target.classList.contains("cart-qty-btn")) {
+        const id = target.getAttribute("data-id");
+        const action = target.getAttribute("data-action");
+        changeCartQuantity(id, action === "plus" ? 1 : -1);
+      }
 
-  cartBtn.addEventListener("click", openCart);
-  cartClose.addEventListener("click", closeCart);
-  cartBackdrop.addEventListener("click", closeCart);
-
-  // quantity + remove (event delegation)
-  cartList.addEventListener("click", (e) => {
-    const target = e.target;
-
-    if (target.classList.contains("cart-qty-btn")) {
-      const id = target.getAttribute("data-id");
-      const action = target.getAttribute("data-action");
-      changeCartQuantity(id, action === "plus" ? 1 : -1);
-    }
-
-    if (target.classList.contains("cart-remove")) {
-      const id = target.getAttribute("data-id");
-      removeFromCart(id);
-    }
-  });
+      if (target.classList.contains("cart-remove")) {
+        const id = target.getAttribute("data-id");
+        removeFromCart(id);
+      }
+    });
+  }
 
   // handle checkout submit
   if (checkoutForm) {
@@ -169,7 +173,7 @@ function setupCartUI() {
       const email = document.getElementById("customerEmail").value.trim();
       const phone = document.getElementById("customerPhone").value.trim();
       const address = document.getElementById("customerAddress").value.trim();
-      const note = document.getElementById("customerNote").value.trim();
+      const note = document.getElementById("customerNote") ? document.getElementById("customerNote").value.trim() : "";
 
       if (!customerName || !phone || !address) {
         alert("Please fill in your name, phone, and address.");
@@ -206,7 +210,14 @@ function setupCartUI() {
         saveCart();
         renderCart();
         checkoutForm.reset();
-        closeCart();
+        
+        // redirect to home if on checkout page
+        if (window.location.pathname.includes("checkout.html")) {
+            window.location.href = "index.html";
+        } else if (cartPanel) {
+            cartPanel.classList.remove("open");
+            cartBackdrop.classList.remove("open");
+        }
       } catch (err) {
         console.error("Checkout error:", err);
         alert("Something went wrong while placing your order.");

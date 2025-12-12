@@ -5,6 +5,9 @@ const router = express.Router();
 
 const MenuItem = require("../models/MenuItem");
 const { authAdmin } = require("../middleware/authMiddleware");
+const adminAuth = require("../middleware/adminAuth");
+router.use(adminAuth);
+
 
 // GET /api/admin/menu
 // Get all menu items (for admin dashboard)

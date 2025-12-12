@@ -14,15 +14,17 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    customerName: { type: String, required: true },
-    email: { type: String },
-    phone: { type: String, required: true },
-    address: { type: String, required: true },
+    customerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+    customerName: { type: String, required: false }, // made optional as we might have customerId
+    email: { type: String, default: "" },
+    phone: { type: String, required: false, default: "" },
+    address: { type: String, required: false, default: "" },
     note: { type: String },
+    status: { type: String, default: "pending" },
 
     items: [orderItemSchema],
 
-    totalAmount: { type: Number, required: true },
+    totalAmount: { type: Number, required: true, default: 0 },
 
     status: {
       type: String,
@@ -34,5 +36,6 @@ const orderSchema = new mongoose.Schema(
 );
 
 const Order = mongoose.model("Order", orderSchema);
+
 
 module.exports = Order;

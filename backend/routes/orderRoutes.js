@@ -5,56 +5,7 @@ const router = express.Router();
 
 const Order = require("../models/order");
 
-// POST /api/orders  -> create new order
-router.post("/", async (req, res) => {
-  console.log("POST /api/orders body:", req.body);
 
-  try {
-    const { customerName, email, phone, address, note, items } = req.body;
-
-    if (!customerName || !phone || !address || !Array.isArray(items) || !items.length) {
-      return res.status(400).json({
-        status: "error",
-        message: "Missing required fields or empty cart.",
-      });
-    }
-
-    // calculate total & map items
-    const mappedItems = items.map((it) => ({
-      menuItem: it._id, // Mongo _id of menu item
-      name: it.name,
-      price: it.price,
-      quantity: it.quantity,
-    }));
-
-    const totalAmount = mappedItems.reduce(
-      (sum, it) => sum + it.price * it.quantity,
-      0
-    );
-
-    const order = await Order.create({
-      customerName,
-      email,
-      phone,
-      address,
-      note,
-      items: mappedItems,
-      totalAmount,
-    });
-
-    res.status(201).json({
-      status: "ok",
-      message: "Order placed successfully",
-      data: order,
-    });
-  } catch (err) {
-    console.error("Error creating order:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Failed to create order",
-    });
-  }
-});
 
 // GET /api/orders  -> list all orders (for admin)
 router.get("/", authAdmin, async (req, res) => {
@@ -119,5 +70,64 @@ router.patch("/:id/status", authAdmin, async (req, res) => {
     });
   }
 });
+
+const { authUser } = require("../middleware/authUser"); // our user auth middleware
+// note: we do NOT apply authUser globally here - use it conditionally inside the handler
+
+// POST /api/orders
+router.post("/", async (req, res) => {
+  try {
+    // If the request has Authorization header + valid token, populate req.user
+    // We can call authUser middleware manually to check token without making route protected.
+    let customerId = null;
+    let customerName = req.body.customerName || "";
+    try {
+      // If token present, verify and set req.user (authUser expects headers & sets req.user)
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        // call authUser-like logic manually to avoid double-route mounting issues
+        // simplest: reuse authUser by invoking it
+        await new Promise((resolve, reject) => {
+          // create a fake next to capture errors
+          authUser(req, res, (err) => {
+            if (err) return reject(err);
+            return resolve();
+          });
+        });
+        if (req.user) {
+          customerId = req.user._id;
+          // prefer server-side user name if available
+          customerName = req.user.name || customerName;
+        }
+      }
+    } catch (e) {
+      // invalid token — ignore and proceed as guest order
+      console.warn("Order creation: token invalid or missing, creating guest order.");
+    }
+
+    // Build order object from request body
+    const { items, totalAmount, phone, email, address } = req.body;
+
+    const orderData = {
+      items: items || [],
+      totalAmount: totalAmount || 0,
+      phone: phone || "",
+      email: email || "",
+      address: address || "",
+      customerName: customerName || "",
+      status: "pending",
+    };
+
+    if (customerId) orderData.customerId = customerId;
+
+    const order = await Order.create(orderData);
+
+    return res.status(201).json({ status: "ok", data: order });
+  } catch (err) {
+    console.error("Create order error:", err);
+    return res.status(500).json({ status: "error", message: "Failed to create order", detail: err.message });
+  }
+});
+
 
 module.exports = router;
