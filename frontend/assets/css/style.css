@@ -27,7 +27,7 @@
   --champagne-pink: hsl(23, 61%, 86%);
   --spanish-gray: hsl(0, 0%, 60%);
   --sonic-silver: hsl(0, 0%, 47%);
-  --deep-saffron: hsl(32, 100%, 59%);
+  --deep-saffron: hsl(32, 100%, 59%); /* Vivid Orange */
   --dark-orange: hsl(28, 100%, 58%);
   --desert-sand: hsl(23, 49%, 82%);
   --isabelline: hsl(38, 44%, 96%);
@@ -39,6 +39,9 @@
   --white: hsl(0, 0%, 100%);
   --black: hsl(0, 0%, 0%);
   --onyx: hsl(0, 0%, 27%);
+  
+  /* New Gradient for Buttons */
+  --btn-gradient: linear-gradient(to right, var(--deep-saffron), var(--tangerine));
 
   /**
    * typography
@@ -65,11 +68,12 @@
   --section-padding: 60px;
 
   /**
-   * shadow
+   * shadow (Modernized)
    */
 
-  --shadow-1: 0 1px 4px hsla(0, 0%, 0%, 0.2);
-  --shadow-2: 0 1px 2px hsla(0, 0%, 0%, 0.2);
+  --shadow-1: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-2: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
   /**
    * transition
@@ -77,6 +81,7 @@
 
   --transition-1: 0.25s ease;
   --transition-2: 0.5s ease;
+  --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
   /**
    * clip path

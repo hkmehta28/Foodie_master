@@ -2,273 +2,198 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Foodie Admin - Orders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foodie Admin Portal</title>
   <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="./assets/css/style.css" />
-
-  <style>
-    /* Basic admin layout */
-    body {
-      background-color: #f7f7f7;
-    }
-
-    .admin-container {
-      max-width: 1100px;
-      margin: 40px auto;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-
-        .admin-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        margin-bottom: 20px;
-        }
-
-        .admin-actions {
-        display: flex;
-        gap: 10px;
-        }
-
-        .admin-actions .btn {
-        font-size: 0.9rem;
-        padding: 10px 18px;
-        min-width: 120px;
-        text-align: center;
-        }
-
-
-    .admin-title {
-      font-size: 1.6rem;
-      font-weight: 600;
-    }
-
-    .orders-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-
-    .orders-table th,
-    .orders-table td {
-      border: 1px solid #eee;
-      padding: 8px 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    .orders-table th {
-      background-color: #fafafa;
-      font-weight: 600;
-    }
-
-    .badge-status {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      text-transform: capitalize;
-    }
-
-    .status-pending { background: #ffeaa7; color: #664d03; }
-    .status-confirmed { background: #a3e4d7; color: #0b5345; }
-    .status-preparing { background: #f6c453; color: #7a4f01; }
-    .status-out-for-delivery { background: #74b9ff; color: #0c2461; }
-    .status-completed { background: #c6f6d5; color: #22543d; }
-    .status-cancelled { background: #ffcccc; color: #8b0000; }
-
-    .status-select {
-      font-size: 0.8rem;
-      padding: 2px 4px;
-    }
-
-    .small-text {
-      font-size: 0.8rem;
-      color: #666;
-    }
-
-    .items-list {
-      list-style: disc;
-      padding-left: 18px;
-      margin: 0;
-    }
-
-    .refresh-btn {
-      font-size: 0.85rem;
-      padding: 6px 10px;
-    }
-
-    /* Fixed Button Styles for Table */
-    .orders-table .btn {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      min-width: auto;
-      height: auto;
-      display: inline-block;
-      margin-right: 5px;
-      margin-bottom: 4px;
-    }
-
-    .menu-edit-btn { --bg-color: #2980b9; } 
-    .menu-delete-btn { --bg-color: #c0392b; }
-    .menu-toggle-btn { --bg-color: #f39c12; color: #fff; }
-
-    /* Fixed Button Styles for Header Actions */
-    #open-add-menu-btn,
-    #refresh-menu-btn {
-      font-size: 0.9rem;
-      padding: 8px 16px;
-      height: auto;
-      min-width: unset;
-      display: inline-block;
-    }
-    input[type="file"] {
-      display: block !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      appearance: auto !important; /* Restore native appearance */
-      border: 1px solid #ddd !important;
-      background-color: #f9f9f9 !important;
-      padding: 6px !important;
-      border-radius: 4px !important;
-      height: auto !important;
-      width: 100% !important;
-      margin-top: 5px;
-    }
-  </style>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="./assets/css/admin.css" />
 </head>
 <body>
-  <div class="admin-container">
 
-    <!-- LOGIN SECTION -->
-    <section id="login-section" style="margin-bottom: 20px;">
-      <h2 style="font-size: 1.1rem; margin-bottom: 8px;">Admin Login</h2>
-
-      <div id="login-message" class="small-text" style="color: red; display: none; margin-bottom: 6px;"></div>
-
-      <input
-        type="email"
-        id="admin-email"
-        class="admin-input"
-        placeholder="Admin email"
-        style="width: 100%; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #ddd;"
-      />
-      <input
-        type="password"
-        id="admin-password"
-        class="admin-input"
-        placeholder="Password"
-        style="width: 100%; padding: 8px 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #ddd;"
-      />
-
-      <button id="login-btn" class="btn btn-hover" style="min-width: 120px;">Login</button>
-
-    </section>
-
-      <!-- MENU MANAGEMENT SECTION -->
-    <section id="menu-section" style="margin-top: 30px; display: none;">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;">
-        <h2 style="margin:0; font-size:1.1rem;">Menu Management</h2>
-        <div>
-          <button id="open-add-menu-btn" class="btn btn-hover">Add Menu Item</button>
-          <button id="refresh-menu-btn" class="btn btn-hover">Refresh Menu</button>
-        </div>
+  <!-- ================= LOGIN SECTION ================= -->
+  <section id="login-section">
+    <div class="login-card">
+      <div class="login-logo">
+        <i class="fas fa-utensils"></i> Foodie Admin
       </div>
-
-      <table class="orders-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price (₹)</th>
-            <th>Veg</th>
-            <th>Available</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="menu-tbody">
-          <!-- injected by JS -->
-        </tbody>
-      </table>
-
-      <p id="menu-empty" class="small-text" style="margin-top:10px; display:none;">No menu items.</p>
-    </section>
-
-    <!-- MENU FORM MODAL (hidden) -->
-    <div id="menu-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:9999;">
-      <div style="background:#fff; padding:18px; border-radius:8px; width:420px; max-width:95%;">
-        <h3 id="menu-modal-title">Add Menu Item</h3>
-
-        <div id="menu-form-msg" class="small-text" style="color:red; display:none; margin-bottom:8px;"></div>
-
-        <input id="menu-name" placeholder="Name" class="admin-input" style="margin-bottom:8px;" />
-        <input id="menu-category" placeholder="Category (eg. Burger, Pizza)" class="admin-input" style="margin-bottom:8px;" />
-        <input id="menu-price" placeholder="Price (number)" class="admin-input" style="margin-bottom:8px;" />
-        <!-- OPTIONAL: type/paste a direct image URL -->
-        <input id="menu-image" placeholder="Paste image URL (optional)" class="admin-input" style="margin-bottom:8px;" />
-
-        <!-- Upload image from computer -->
-        <label style="display:block; margin-bottom:12px;">
-          <span class="small-text">Or upload an image:</span><br>
-          <input type="file" id="menu-file" accept="image/*" />
-        </label>
-
-        <label style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
-          <input id="menu-isVeg" type="checkbox" /> Veg
-          <input id="menu-isAvailable" type="checkbox" style="margin-left:12px;" /> Available
-        </label>
-
-        <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:10px;">
-          <button id="menu-cancel-btn" class="btn btn-hover">Cancel</button>
-          <button id="menu-save-btn" class="btn btn-hover" style="background:#ff9f0d; color:#fff;">Save</button>
-        </div>
+      <p class="small-text mb-20">Please sign in to continue</p>
+      
+      <div id="login-message" class="text-danger small-text mb-20" style="display: none;"></div>
+      
+      <div class="form-group">
+        <input type="email" id="admin-email" class="form-input" placeholder="Email Address" required>
+      </div>
+      <div class="form-group">
+        <input type="password" id="admin-password" class="form-input" placeholder="Password" required>
+      </div>
+      
+      <button id="login-btn" class="btn w-100" style="width: 100%;">Sign In</button>
+      <div class="mt-20">
+        <a href="./index.html" class="small-text">Back to Website</a>
       </div>
     </div>
+  </section>
 
-    <!-- ORDERS SECTION (hidden until login) -->
-    <section id="orders-section" style="display: none;">
-      <div class="admin-header">
-        <h1 class="admin-title">Orders Dashboard</h1>
 
-        <div class="admin-actions">
-          <span id="admin-email-display" class="small-text" style="margin-right: 8px;"></span>
-          <button id="refresh-btn" class="btn btn-hover">Refresh</button>
-          <button id="logout-btn" class="btn btn-hover">Logout</button>
-          <a href="./index.html" class="btn btn-hover">Go to Website</a>
+  <!-- ================= DASHBOARD CONTAINER ================= -->
+  <div id="dashboard-container" class="dashboard-container" style="display: none;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand-link">
+          <i class="fas fa-utensils"></i> <span>Foodie</span>
+        </a>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-tab="orders-section">
+          <i class="fas fa-shopping-bag"></i> <span class="sidebar-link-text">Orders</span>
         </div>
+        <div class="nav-item" data-tab="menu-section">
+          <i class="fas fa-hamburger"></i> <span class="sidebar-link-text">Menu Items</span>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <span id="admin-email-display" class="admin-user-info"></span>
+        <button id="logout-btn" class="btn btn-outline" style="width: 100%; font-size: 0.8rem;">
+          <i class="fas fa-sign-out-alt"></i> <span class="sidebar-link-text">Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- ORDERS SECTION -->
+      <section id="orders-section" class="tab-content active">
+        <div class="page-header">
+          <h1 class="page-title">Orders Dashboard</h1>
+          <button id="refresh-btn" class="btn btn-secondary">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+
+        <div id="orders-message" class="text-danger mb-20" style="display: none;"></div>
+        <div id="orders-success" class="text-success mb-20" style="display: none;"></div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Placed At</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <!-- JS Inject -->
+              </tbody>
+            </table>
+          </div>
+          <p id="orders-empty" class="text-center small-text mt-20" style="display: none;">No orders found.</p>
+        </div>
+      </section>
+
+      <!-- MENU SECTION -->
+      <section id="menu-section" class="tab-content">
+        <div class="page-header">
+          <h1 class="page-title">Menu Management</h1>
+          <div class="menu-controls">
+            <button id="refresh-menu-btn" class="btn btn-secondary">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button id="open-add-menu-btn" class="btn">
+              <i class="fas fa-plus"></i> Add Item
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Veg</th>
+                  <th>Availability</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="menu-tbody">
+                <!-- JS Inject -->
+              </tbody>
+            </table>
+          </div>
+          <p id="menu-empty" class="text-center small-text mt-20" style="display: none;">No menu items found.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ================= MENU MODAL ================= -->
+  <div id="menu-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="menu-modal-title" class="modal-title">Add Menu Item</h3>
+        <button id="menu-cancel-btn" class="btn btn-outline" style="color: #333; border: none; font-size: 1.2rem;">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
-      <div id="orders-message" class="small-text" style="color: red; display: none; margin-bottom: 6px;"></div>
-      <div id="orders-success" class="small-text" style="color: green; display: none; margin-bottom: 6px;"></div>
+      <div id="menu-form-msg" class="text-danger small-text mb-20" style="display: none;"></div>
 
-      <table class="orders-table">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Placed At</th>
-          </tr>
-        </thead>
-        <tbody id="orders-tbody">
-          <!-- JS will inject rows here -->
-        </tbody>
-      </table>
+      <div class="form-group">
+        <label class="small-text">Item Name</label>
+        <input id="menu-name" class="form-input" placeholder="e.g. Cheese Burger" />
+      </div>
 
-      <p id="orders-empty" class="small-text" style="margin-top: 10px; display: none;">
-        No orders yet.
-      </p>
-    </section>
+      <div class="form-group">
+        <label class="small-text">Category</label>
+        <input id="menu-category" class="form-input" placeholder="e.g. Burgers, Pizza" />
+      </div>
 
+      <div class="form-group">
+        <label class="small-text">Price (₹)</label>
+        <input id="menu-price" type="number" class="form-input" placeholder="0.00" />
+      </div>
+
+      <div class="form-group">
+        <label class="small-text">Image URL (Optional)</label>
+        <input id="menu-image" class="form-input" placeholder="https://..." />
+      </div>
+      
+      <div class="form-group">
+         <label class="small-text">Or Upload Image</label>
+         <input type="file" id="menu-file" class="form-input" accept="image/*">
+      </div>
+
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input id="menu-isVeg" type="checkbox" class="checkbox-input" /> Vegetarian
+        </label>
+        <label class="checkbox-label">
+          <input id="menu-isAvailable" type="checkbox" class="checkbox-input" /> Available
+        </label>
+      </div>
+
+      <div class="text-center">
+        <button id="menu-save-btn" class="btn w-100" style="width: 100%;">Save Item</button>
+      </div>
+    </div>
   </div>
 
   <script src="./assets/js/admin.js"></script>
 </body>
-
 </html>

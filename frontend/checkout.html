@@ -3,112 +3,128 @@
 <head>
   <meta charset="utf-8" />
   <title>Checkout - Foodie</title>
+  <!-- Auth Guard -->
+  <script src="./assets/js/auth-guard.js"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="./assets/css/style.css" />
-  <style>
-    /* simple checkout styles */
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f7f7f7; color:#333; }
-    .wrap { max-width: 980px; margin:120px auto 32px; padding:20px; }
-    .card { background:#fff; border-radius:10px; padding:18px; box-shadow:0 8px 30px rgba(0,0,0,0.06); margin-bottom:18px; }
-    h1 { margin:0 0 12px 0; font-size:1.4rem; }
-    .grid { display:grid; gap:20px; grid-template-columns: 1fr 420px; }
-    .col { }
-    .form-row { margin-bottom:10px; }
-    input[type="text"], input[type="email"], input[type="tel"] { width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; }
-    .items-list { width:100%; border-collapse: collapse; margin-bottom:12px; }
-    .items-list th, .items-list td { padding:8px 10px; border-bottom: 1px solid #eee; text-align:left; vertical-align: middle; }
-    .summary { font-size:0.95rem; }
-    .btn { display:inline-block; background:#ff9f0d; color:#fff; padding:10px 16px; border-radius:8px; border:none; cursor:pointer; font-weight:600; }
-    .muted { color:#666; font-size:0.9rem; }
-    .small { font-size:0.85rem; color:#666; }
-    .qty { min-width:40px; text-align:center; }
-    .center { text-align:center; }
-    .empty { text-align:center; padding:30px; color:#777; }
-  </style>
+  <link rel="stylesheet" href="./assets/css/checkout.css" />
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Checkout</h1>
-      <p class="muted">Review your items, confirm delivery details and place order.</p>
+  <div class="checkout-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">Checkout</h1>
+      <p class="page-subtitle">Review your items and confirm delivery details</p>
     </div>
 
-    <div class="grid">
-      <!-- left: customer details + instructions -->
-      <div class="col">
-        <div class="card">
-          <h2 style="font-size:1.1rem;">Delivery details</h2>
+    <div class="checkout-grid">
+      <!-- Left Column: Delivery Form -->
+      <div class="checkout-column">
+        <div class="checkout-card">
+          <h2 class="card-title">Order Details</h2>
 
-          <!-- These input IDs match the auth.js autofill -->
-          <div class="form-row">
-            <label class="small">Name</label>
-            <input id="customer-name" type="text" placeholder="Full name" />
+          <!-- Order Type Selector -->
+          <div class="order-type-selector">
+            <div class="order-option active" onclick="setOrderType('delivery')">Home Delivery</div>
+            <div class="order-option" onclick="setOrderType('takeaway')">Takeaway</div>
+            <div class="order-option" onclick="setOrderType('dinein')">Dine-in</div>
           </div>
+          
           <div class="form-row">
-            <label class="small">Email</label>
-            <input id="customer-email" type="email" placeholder="Email" />
+            <label class="input-label">Full Name</label>
+            <input id="customer-name" type="text" class="input-field" placeholder="John Doe">
           </div>
+          
           <div class="form-row">
-            <label class="small">Phone</label>
-            <input id="customer-phone" type="tel" placeholder="Phone" />
+            <label class="input-label">Email Address</label>
+            <input id="customer-email" type="email" class="input-field" placeholder="john@example.com">
           </div>
+          
           <div class="form-row">
-            <label class="small">Address</label>
-            <input id="customer-address" type="text" placeholder="Delivery address" />
+            <label class="input-label">Phone Number</label>
+            <input id="customer-phone" type="tel" class="input-field" placeholder="+1 234 567 890">
+          </div>
+          
+          <!-- Delivery Specific -->
+          <div id="delivery-fields" class="form-section">
+            <div class="form-row">
+              <label class="input-label">Delivery Address</label>
+              <input id="customer-address" type="text" class="input-field" placeholder="123 Street Name, City">
+            </div>
           </div>
 
-          <div id="checkout-msg" class="small" style="color:red; display:none;"></div>
-
-          <div style="margin-top:12px;">
-            <button id="place-order-btn" class="btn">Place order</button>
-            <button id="back-btn" class="btn" style="background:#ddd;color:#222;margin-left:8px;">Back to menu</button>
+          <!-- Takeaway/Dine-in Specific (Time) -->
+          <div id="time-fields" class="form-section hidden-field">
+            <div class="form-row">
+              <label class="input-label" id="time-label">Pickup Time</label>
+              <input id="order-time" type="time" class="input-field">
+            </div>
           </div>
+
+          <!-- Dine-in Specific -->
+          <div id="dinein-fields" class="form-section hidden-field">
+            <div class="form-row">
+              <label class="input-label">Number of Guests</label>
+              <input id="guest-count" type="number" min="1" class="input-field" placeholder="e.g. 2">
+            </div>
+          </div>
+
+          <div id="checkout-msg" class="error-banner"></div>
         </div>
 
-        <div class="card">
-          <h2 style="font-size:1.1rem;">Notes</h2>
-          <p class="small">By placing the order you confirm that the details are correct. If you're not logged in, your order will be created as a guest — create an account to save order history.</p>
-          <p class="small">If you want to login first, <a href="./auth/login.html">Login</a> or <a href="./auth/signup.html">Sign up</a>.</p>
+        <div class="checkout-card">
+          <h2 class="card-title">Important Notes</h2>
+          <p style="font-size: 0.9rem; color: #666;">
+            By placing the order you confirm that the details are correct. 
+            Payment will be collected upon delivery/pickup.
+          </p>
+          <div class="guest-notice">
+            If you want to save your order history, please <a href="./auth/login.html">Login</a> or <a href="./auth/signup.html">Sign up</a>.
+          </div>
         </div>
       </div>
 
-      <!-- right: order summary -->
-      <div class="col">
-        <div class="card">
-          <h2 style="font-size:1.1rem;">Order summary</h2>
+      <!-- Right Column: Order Summary -->
+      <div class="checkout-column">
+        <div class="checkout-card summary-card">
+          <h2 class="card-title">Order Summary</h2>
+          
           <div id="order-container">
-            <table class="items-list" id="items-table">
+            <table class="items-table">
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th class="center">Qty</th>
-                  <!-- <th class="center">Price</th> -->
-                  <th class="center">Total</th>
+                  <th width="60%">Item</th>
+                  <th width="20%" style="text-align: center;">Qty</th>
+                  <th width="20%" style="text-align: right;">Price</th>
                 </tr>
               </thead>
               <tbody id="items-tbody">
-                <!-- rows injected here -->
+                <!-- Javascript will inject rows here -->
               </tbody>
             </table>
 
-            <div id="empty-cart" class="empty" style="display:none;">Your cart is empty. <a href="./index.html">Go to menu</a></div>
-
-            <div id="summary" class="summary" style="display:none;">
-              <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                <div class="muted">Subtotal</div>
-                <div id="subtotal-amt">₹0.00</div>
-              </div>
-              <div style="display:flex; justify-content:space-between; margin-top:6px;">
-                <div class="muted">Delivery</div>
-                <div id="delivery-amt">₹0.00</div>
-              </div>
-              <hr />
-              <div style="display:flex; justify-content:space-between; font-weight:700; margin-top:6px;">
-                <div>Total</div>
-                <div id="total-amt">₹0.00</div>
-              </div>
+            <div id="empty-cart" style="text-align: center; padding: 20px; color: #666; display: none;">
+              Your cart is empty. <br> <a href="./index.html" style="color: var(--deep-saffron); margin-top: 10px; display: inline-block;">Browse Menu</a>
             </div>
 
+            <div id="summary" style="display: none;">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal-amt">₹0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Delivery Fee</span>
+                <span id="delivery-amt">₹0.00</span>
+              </div>
+              
+              <div class="summary-total">
+                <span>Total</span>
+                <span id="total-amt">₹0.00</span>
+              </div>
+
+              <button id="place-order-btn" class="place-order-btn">Place Order</button>
+            </div>
+            
+            <a href="./index.html" id="back-btn" class="back-btn">Continue Shopping</a>
           </div>
         </div>
       </div>
@@ -168,50 +184,91 @@
         // Column 1: Item Details + Unit Price
         const tdName = document.createElement("td");
         tdName.innerHTML = `
-        <div style="display:flex; gap:12px; align-items:flex-start;">
-          ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;" />` : ''}
-          <div style="flex:1;">
-            <div style="font-weight:600; font-size:0.95rem; line-height:1.2; margin-bottom:4px;">${it.name}</div>
-            <div class="small" style="font-size:0.85rem; color:#777;">${currency(price)}</div>
+        <div class="item-meta">
+          ${it.imageUrl ? `<img src="${it.imageUrl}" class="item-img" />` : '<div class="item-img"></div>'}
+          <div class="item-info">
+            <h4>${it.name}</h4>
+            <div class="item-price">${currency(price)}</div>
           </div>
         </div>`;
 
         // Column 2: Quantity Controls
         const tdQty = document.createElement("td");
-        tdQty.className = "center";
-        tdQty.style.whiteSpace = "nowrap"; // Prevent buttons from wrapping
+        tdQty.style.textAlign = "center";
         tdQty.innerHTML = `
-          <div style="display:inline-flex; align-items:center; background:#f0f0f0; border-radius:6px; padding:2px;">
-            <button onclick="updateQuantity(${idx}, -1)" style="width:28px; height:28px; border:none; background:transparent; font-weight:bold; color:#555; cursor:pointer;">-</button>
-            <span style="font-weight:600; font-size:0.9rem; min-width:24px; text-align:center;">${qty}</span>
-            <button onclick="updateQuantity(${idx}, 1)" style="width:28px; height:28px; border:none; background:transparent; font-weight:bold; color:#555; cursor:pointer;">+</button>
+          <div class="qty-control" style="margin: 0 auto;">
+            <button onclick="updateQuantity(${idx}, -1)" class="qty-btn">-</button>
+            <span class="qty-val">${qty}</span>
+            <button onclick="updateQuantity(${idx}, 1)" class="qty-btn">+</button>
           </div>
         `;
 
         // Column 3: Subtotal
         const tdSub = document.createElement("td");
-        tdSub.className = "center";
-        tdSub.style.fontWeight = "700";
-        tdSub.style.fontSize = "0.95rem";
+        tdSub.className = "item-subtotal";
         tdSub.textContent = currency(qty * price);
 
         row.appendChild(tdName);
         row.appendChild(tdQty);
-        row.appendChild(tdSub); // Removed individual Price column
+        row.appendChild(tdSub);
 
         tbody.appendChild(row);
 
         subtotal += qty * price;
       });
 
-      // Simple flat delivery fee logic (you can change)
-      const delivery = subtotal > 0 && subtotal < 500 ? 30 : 0;
+      // Simple flat delivery fee logic
+      // Only charge delivery fee if order type is 'delivery'
+      const delivery = (typeof currentOrderType !== 'undefined' && currentOrderType === 'delivery' && subtotal > 0 && subtotal < 500) ? 30 : 0;
+      
       document.getElementById("subtotal-amt").textContent = currency(subtotal);
       document.getElementById("delivery-amt").textContent = currency(delivery);
       document.getElementById("total-amt").textContent = currency(subtotal + delivery);
     }
 
-    // placeOrder: sends order to backend and includes auth token if available
+    // Order Type Logic
+    let currentOrderType = 'delivery'; // default
+
+    function setOrderType(type) {
+        currentOrderType = type;
+        
+        // Update UI Tabs
+        document.querySelectorAll('.order-option').forEach(opt => opt.classList.remove('active'));
+        // Find button by text content is tricky, let's use onclick attribute search or index. 
+        // Better: renderCart re-calcs delivery fee.
+        
+        // Simple UI update based on index/text (Mapping: delivery=0, takeaway=1, dinein=2)
+        const opts = document.querySelectorAll('.order-option');
+        if(type === 'delivery') opts[0].classList.add('active');
+        if(type === 'takeaway') opts[1].classList.add('active');
+        if(type === 'dinein') opts[2].classList.add('active');
+
+        // Show/Hide Fields
+        const delFields = document.getElementById('delivery-fields');
+        const timeFields = document.getElementById('time-fields');
+        const dineFields = document.getElementById('dinein-fields');
+        const timeLabel = document.getElementById('time-label');
+
+        if (type === 'delivery') {
+            delFields.style.display = 'block';
+            timeFields.style.display = 'none';
+            dineFields.style.display = 'none';
+        } else if (type === 'takeaway') {
+            delFields.style.display = 'none';
+            timeFields.style.display = 'block';
+            dineFields.style.display = 'none';
+            timeLabel.textContent = "Pickup Time";
+        } else if (type === 'dinein') {
+            delFields.style.display = 'none';
+            timeFields.style.display = 'block';
+            dineFields.style.display = 'block';
+            timeLabel.textContent = "Arrival Time";
+        }
+
+        renderCart(); // Recalculate totals (remove delivery fee)
+    }
+
+    // placeOrder: sends order to backend
     async function placeOrder() {
       const placeBtn = document.getElementById("place-order-btn");
       const msgEl = document.getElementById("checkout-msg");
@@ -221,11 +278,26 @@
       const name = document.getElementById("customer-name")?.value.trim() || "";
       const phone = document.getElementById("customer-phone")?.value.trim() || "";
       const email = document.getElementById("customer-email")?.value.trim() || "";
+      
+      // Conditional fields
       const address = document.getElementById("customer-address")?.value.trim() || "";
+      const time = document.getElementById("order-time")?.value || "";
+      const guests = document.getElementById("guest-count")?.value.trim() || "";
 
-      if (!name || !phone || !address) {
-        if (msgEl) { msgEl.textContent = "Please fill name, phone and address."; msgEl.style.display = "block"; }
+      // Validation
+      if (!name || !phone) {
+        if (msgEl) { msgEl.textContent = "Please fill in your name and phone number."; msgEl.style.display = "block"; }
         return;
+      }
+
+      if (currentOrderType === 'delivery' && !address) {
+         if (msgEl) { msgEl.textContent = "Please enter a delivery address."; msgEl.style.display = "block"; }
+         return;
+      }
+
+      if ((currentOrderType === 'takeaway' || currentOrderType === 'dinein') && !time) {
+         if (msgEl) { msgEl.textContent = `Please select a ${currentOrderType === 'takeaway' ? 'pickup' : 'arrival'} time.`; msgEl.style.display = "block"; }
+         return;
       }
 
       const { items, key } = readCartFromStorage();
@@ -234,7 +306,7 @@
         return;
       }
 
-      // compute totals same as renderCart
+      // compute totals
       let subtotal = 0;
       const normalizedItems = items.map(it => {
         const qty = Number(it.quantity || it.qty || 1);
@@ -242,7 +314,9 @@
         subtotal += qty * price;
         return { menuItem: it._id || it.id, name: it.name, price, quantity: qty };
       });
-      const delivery = subtotal > 0 && subtotal < 500 ? 30 : 0;
+
+      // Delivery Fee logic: Only for 'delivery'
+      const delivery = (currentOrderType === 'delivery' && subtotal > 0 && subtotal < 500) ? 30 : 0;
       const totalAmount = subtotal + delivery;
 
       // build payload
@@ -252,10 +326,13 @@
         customerName: name,
         phone,
         email,
-        address,
+        address: currentOrderType === 'delivery' ? address : `[${currentOrderType.toUpperCase()}]`, // Mark as non-delivery
+        orderType: currentOrderType, // Add backend field if supported, or pack into notes/address
+        pickupTime: time,
+        numberOfGuests: guests
       };
 
-      // token from auth.js (auth saved token as "userToken")
+      // token from auth.js
       const token = window.auth?.getToken ? window.auth.getToken() : localStorage.getItem("userToken");
       const headers = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -275,31 +352,29 @@
           console.error("Order error:", data);
           if (msgEl) { msgEl.textContent = data.message || data.detail || "Order failed"; msgEl.style.display = "block"; }
           placeBtn.disabled = false;
-          placeBtn.textContent = "Place order";
+          placeBtn.textContent = "Place Order";
           return;
         }
 
-        // success: clear cart
-        // remove all known keys
+        // success
         for (const k of CART_KEYS) localStorage.removeItem(k);
-
-        // redirect to my-orders page (adjust path if needed)
         window.location.href = "/frontend/my-order.html";
       } catch (err) {
         console.error("Place order error:", err);
         if (msgEl) { msgEl.textContent = "Failed to place order"; msgEl.style.display = "block"; }
       } finally {
         placeBtn.disabled = false;
-        placeBtn.textContent = "Place order";
+        placeBtn.textContent = "Place Order";
       }
     }
 
       document.addEventListener("DOMContentLoaded", () => {
-      // allow auth.js to auto-fill (auth.js runs its own DOMContentLoaded too)
       try { window.auth?.autofillCheckout(); } catch(e) {}
       renderCart();
+      
+      // Initialize view
+      setOrderType('delivery');
 
-      // wire place order button
       const placeBtn = document.getElementById("place-order-btn");
       if (placeBtn) placeBtn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -309,12 +384,6 @@
       const back = document.getElementById("back-btn");
       if (back) back.addEventListener("click", (e) => { e.preventDefault(); window.location.href = "./index.html"; });
 
-      // live update if cart changes in another tab
-      window.addEventListener("storage", (e) => {
-        // if (CART_KEYS.includes(e.key)) renderCart(); // Disabled to avoid conflict with local updates
-      });
-      
-      // Also listen for internal events
       window.addEventListener("cartUpdated", renderCart);
     });
 

@@ -3,6 +3,7 @@
 const API_BASE_URL = "http://localhost:4000";
 
 // ---- DOM elements ----
+const dashboardContainer = document.getElementById("dashboard-container");
 const loginSection = document.getElementById("login-section");
 const ordersSection = document.getElementById("orders-section");
 const loginMessage = document.getElementById("login-message");
@@ -22,16 +23,31 @@ let adminEmail = null;
 
 // ---- Helpers to toggle sections ----
 function showLogin() {
-  if (loginSection) loginSection.style.display = "block";
-  if (ordersSection) ordersSection.style.display = "none";
-  // also hide menu section if present
-  const menuSection = document.getElementById("menu-section");
-  if (menuSection) menuSection.style.display = "none";
+  if (loginSection) loginSection.style.display = "flex"; // Flex for centering
+  if (dashboardContainer) dashboardContainer.style.display = "none";
 }
 
-function showOrders() {
+function showDashboard() {
   if (loginSection) loginSection.style.display = "none";
-  if (ordersSection) ordersSection.style.display = "block";
+  if (dashboardContainer) dashboardContainer.style.display = "flex";
+  // Default to orders if no tab active? 
+  // The HTML has orders-section active by default.
+}
+
+// Switch Tab
+function switchTab(tabId) {
+  // Update nav items
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.classList.remove("active");
+    if (item.dataset.tab === tabId) item.classList.add("active");
+  });
+
+  // Update tab content
+  document.querySelectorAll(".tab-content").forEach(content => {
+    content.classList.remove("active");
+  });
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add("active");
 }
 
 // ---- Load admin from localStorage ----
@@ -45,15 +61,11 @@ function loadAdminFromStorage() {
     if (adminEmailDisplay) {
       adminEmailDisplay.textContent = `Logged in as: ${adminEmail}`;
     }
-    showOrders();
-    renderOrders();
-
-    // show and render menu management too (if HTML exists)
-    const menuSection = document.getElementById("menu-section");
-    if (menuSection) {
-      menuSection.style.display = "block";
-      renderMenuTable().catch((e) => console.error(e));
-    }
+    showDashboard();
+    renderOrders(); // Always render orders on load
+    
+    // Also render menu just in case they switch
+    renderMenuTable().catch((e) => console.error(e));
   } else {
     showLogin();
   }
@@ -111,11 +123,9 @@ async function loginAdmin() {
       adminEmailDisplay.textContent = `Logged in as: ${adminEmail}`;
     }
 
-    showOrders();
+    showDashboard();
     renderOrders();
-
-    // also show & render menu management if present
-    const menuSection = document.getElementById("menu-section");
+    renderMenuTable().catch((e) => console.error(e));    const menuSection = document.getElementById("menu-section");
     if (menuSection) {
       menuSection.style.display = "block";
       renderMenuTable().catch((e) => console.error(e));
@@ -141,8 +151,8 @@ function logoutAdmin() {
   if (adminEmailDisplay) adminEmailDisplay.textContent = "";
 
   // hide menu section if exists
-  const menuSection = document.getElementById("menu-section");
-  if (menuSection) menuSection.style.display = "none";
+  // const menuSection = document.getElementById("menu-section");
+  // if (menuSection) menuSection.style.display = "none";
 
   showLogin();
 }
@@ -419,15 +429,34 @@ async function renderMenuTable() {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${it.name}</td>
-      <td>${it.category}</td>
-      <td>₹${typeof it.price === "number" ? it.price.toFixed(2) : it.price}</td>
-      <td>${it.isVeg ? "Yes" : "No"}</td>
-      <td>${it.isAvailable ? "Yes" : "No"}</td>
       <td>
-        <button class="btn btn-hover menu-edit-btn" data-id="${it._id}">Edit</button>
-        <button class="btn btn-hover menu-delete-btn" data-id="${it._id}">Delete</button>
-        <button class="btn btn-hover menu-toggle-btn" data-id="${it._id}">${it.isAvailable ? "Set Unavailable" : "Set Available"}</button>
+        <img src="${it.imageUrl || './assets/images/food-menu-1.png'}" alt="${it.name}" class="menu-img-preview" onerror="this.src='./assets/images/food-menu-1.png'">
+      </td>
+      <td><strong>${it.name}</strong></td>
+      <td><span class="badge" style="background:#eee; color:#333;">${it.category}</span></td>
+      <td>₹${typeof it.price === "number" ? it.price.toFixed(2) : it.price}</td>
+      <td>
+         <span class="badge ${it.isVeg ? 'status-completed' : 'status-cancelled'}" style="background:${it.isVeg ? '#d4edda' : '#f8d7da'}; color: ${it.isVeg ? '#155724' : '#721c24'}">
+           ${it.isVeg ? "Veg" : "Non-Veg"}
+         </span>
+      </td>
+      <td>
+        <span class="badge ${it.isAvailable ? 'status-confirmed' : 'status-pending'}">
+          ${it.isAvailable ? "Available" : "Unavailable"}
+        </span>
+      </td>
+      <td>
+        <div style="display:flex; gap:5px;">
+          <button class="btn btn-secondary menu-edit-btn" data-id="${it._id}" style="padding:5px 10px; font-size:0.8rem;">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-warning menu-toggle-btn" data-id="${it._id}" style="padding:5px 10px; font-size:0.8rem; background-color:#f39c12; color:#fff;" title="Toggle Availability">
+            <i class="fas fa-eye${it.isAvailable ? '' : '-slash'}"></i>
+          </button>
+          <button class="btn btn-danger menu-delete-btn" data-id="${it._id}" style="padding:5px 10px; font-size:0.8rem;">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </td>
     `;
     menuTbody.appendChild(tr);
@@ -435,6 +464,20 @@ async function renderMenuTable() {
 }
 
 // Open add/edit modal
+
+
+// Close modal
+function closeMenuForm() {
+  if (menuModal) {
+    menuModal.classList.remove("open");
+    // wait for transition to hide display if needed, but CSS handles opacity/visibility
+    // However, we used .modal-overlay { visibility: hidden } so removing open class is enough
+  }
+  editingMenuId = null;
+}
+
+// Open modal
+// Open modal
 function openMenuForm(editItem) {
   editingMenuId = editItem ? editItem._id : null;
   if (menuFormMsg) {
@@ -463,14 +506,10 @@ function openMenuForm(editItem) {
   // RESET FILE INPUT
   const fileInput = document.getElementById("menu-file");
   if (fileInput) fileInput.value = "";
-  if (menuModal) menuModal.style.display = "flex";
+  
+  if (menuModal) menuModal.classList.add("open");
 }
 
-// Close modal
-function closeMenuForm() {
-  if (menuModal) menuModal.style.display = "none";
-  editingMenuId = null;
-}
 
 // Create menu item
 async function createMenuItem(payload) {
@@ -699,6 +738,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+
+
+  // Sidebar Tabs
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const tabId = item.dataset.tab;
+      if (tabId) switchTab(tabId);
+    });
+  });
 
   loadAdminFromStorage();
 });

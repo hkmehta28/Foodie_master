@@ -11,7 +11,9 @@
   <link rel="shortcut icon" href="../favicon.svg" type="image/svg+xml">
 
   <!-- custom css link -->
+  <!-- custom css link -->
   <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
 
   <!-- google font link -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,158 +22,76 @@
     href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Rubik:wght@400;500;600;700&family=Shadows+Into+Light&display=swap"
     rel="stylesheet">
     
-  <style>
-    /* Auth specific overrides */
-    .auth-section {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--isabelline);
-        background-image: url('../assets/images/hero-bg.jpg');
-        background-size: cover;
-        background-position: center;
-        padding-top: 120px;
-        padding-bottom: 60px;
-    }
-    
-    .auth-card {
-        background: var(--white);
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: var(--shadow-2);
-        width: 100%;
-        max-width: 500px;
-        text-align: center;
-    }
-    
-    .auth-title {
-        font-family: var(--ff-rubik);
-        font-size: var(--fs-2);
-        color: var(--rich-black-fogra-29);
-        margin-bottom: 10px;
-    }
-    
-    .auth-subtitle {
-        color: var(--sonic-silver);
-        margin-bottom: 30px;
-        font-size: var(--fs-4);
-    }
-    
-    .form-group {
-        margin-bottom: 15px;
-        text-align: left;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--rich-black-fogra-29);
-        font-weight: var(--fw-500);
-    }
-    
-    .auth-btn {
-        width: 100%;
-        margin-top: 10px;
-    }
-    
-    .auth-footer {
-        margin-top: 20px;
-        font-size: 1.4rem;
-    }
-    
-    .auth-footer a {
-        color: var(--deep-saffron);
-        font-weight: var(--fw-500);
-        display: inline;
-    }
-    
-    .error-msg {
-        background-color: #ffe6e6;
-        color: #d63031;
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        font-size: 1.4rem;
-        display: none;
-        text-align: left;
-    }
-  </style>
+
 </head>
 
 <body id="top">
 
-  <!-- HEADER -->
-  <header class="header" data-header>
-    <div class="container">
-      <h1>
-        <a href="../index.html" class="logo">Foodie<span class="span">.</span></a>
-      </h1>
-
-      <nav class="navbar" data-navbar>
-        <ul class="navbar-list">
-          <li class="nav-item">
-            <a href="../index.html" class="navbar-link" data-nav-link>Home</a>
-          </li>
-          <li class="nav-item">
-            <a href="../index.html#food-menu" class="navbar-link" data-nav-link>Shop</a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="header-btn-group">
-        <button class="nav-toggle-btn" aria-label="Toggle Menu" data-menu-toggle-btn>
-          <span class="line top"></span>
-          <span class="line middle"></span>
-          <span class="line bottom"></span>
-        </button>
+  <div class="auth-container">
+    <!-- Left Side: Visual -->
+    <div class="auth-visual">
+      <div class="auth-visual-content">
+        <h2 class="visual-title">Join Foodie</h2>
+        <p class="visual-text">
+          "One cannot think well, love well, sleep well, if one has not dined well." - Virginia Woolf
+          <br>Create an account to start your delicious journey.
+        </p>
       </div>
     </div>
-  </header>
 
-  <main>
-    <section class="auth-section">
-        <div class="auth-card">
-            <h2 class="auth-title">Create Account</h2>
-            <p class="auth-subtitle">Join us to order delicious food</p>
-            
-            <div id="msg" class="error-msg"></div>
-            
-            <form id="signup-form" onsubmit="return false;">
-                <div class="form-group">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" id="name" placeholder="John Doe" class="input-field" required>
-                </div>
+    <!-- Right Side: Form -->
+    <div class="auth-form-side">
+      <a href="../index.html" class="back-home">
+        <ion-icon name="arrow-back-outline"></ion-icon> Back to Home
+      </a>
 
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" placeholder="example@mail.com" class="input-field" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone" class="form-label">Phone (Optional)</label>
-                    <input type="tel" id="phone" placeholder="+1 234 567 890" class="input-field">
-                </div>
-                
-                <div class="form-group">
-                    <label for="address" class="form-label">Address (Optional)</label>
-                    <input type="text" id="address" placeholder="Your delivery address" class="input-field">
-                </div>
-                
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" placeholder="Create a password" class="input-field" required>
-                </div>
-                
-                <button type="submit" id="signup-btn" class="btn btn-hover auth-btn">Sign Up</button>
-            </form>
-            
-            <div class="auth-footer">
-                <p>Already have an account? <a href="./login.html">Login</a></p>
-            </div>
+      <div class="auth-form-wrapper">
+        <div class="logo-wrapper">
+          <a href="../index.html" class="logo-text">Foodie<span>.</span></a>
         </div>
-    </section>
-  </main>
+
+        <div class="form-header">
+          <h3 class="form-title">Create Account</h3>
+          <p class="form-subtitle">Join us to order delicious food</p>
+        </div>
+
+        <div id="msg" class="error-banner"></div>
+
+        <form id="signup-form" onsubmit="return false;">
+          <div class="custom-input-group">
+            <label for="name" class="custom-label">Full Name</label>
+            <input type="text" id="name" placeholder="John Doe" class="custom-input" required>
+          </div>
+
+          <div class="custom-input-group">
+            <label for="email" class="custom-label">Email Address</label>
+            <input type="email" id="email" placeholder="name@example.com" class="custom-input" required>
+          </div>
+          
+          <div class="custom-input-group">
+            <label for="phone" class="custom-label">Phone (Optional)</label>
+            <input type="tel" id="phone" placeholder="+1 234 567 890" class="custom-input">
+          </div>
+          
+          <div class="custom-input-group">
+            <label for="address" class="custom-label">Address (Optional)</label>
+            <input type="text" id="address" placeholder="Your delivery address" class="custom-input">
+          </div>
+
+          <div class="custom-input-group">
+            <label for="password" class="custom-label">Password</label>
+            <input type="password" id="password" placeholder="Create a password" class="custom-input" required>
+          </div>
+
+          <button type="submit" id="signup-btn" class="submit-btn">Sign Up</button>
+        </form>
+
+        <div class="form-footer">
+          <p>Already have an account? <a href="./login.html" class="highlight-link">Login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -248,7 +168,20 @@
         
         btn.textContent = "Account Created!";
         setTimeout(() => {
-            window.location.href = "../index.html";
+        // Explicitly construct path to index.html using string manipulation
+        const href = window.location.href;
+        const authIndex = href.lastIndexOf('/auth/');
+        if (authIndex !== -1) {
+             let baseUrl = href.substring(0, authIndex);
+             // Verify if 'frontend' is missing from path (common issue when opening files from wrong root)
+             // Only apply this fix for file protocol to avoid breaking server deployments
+             if (window.location.protocol === 'file:' && !baseUrl.includes('/frontend')) {
+                  baseUrl += '/frontend';
+             }
+             window.location.href = baseUrl + '/index.html';
+        } else {
+             window.location.href = "../index.html";
+        }
         }, 500);
         
       } catch (err) {
